@@ -9,12 +9,17 @@
 <body>
     <form action="" method="post">
         {% csrf_token %}
-        <label for=""> Username </label>
+        <label for=""> Username or email </label>
         <input type="text" name = "username">
         <br>
         <label for=""> Password </label>
         <input type="password" name = "password">
         <br>
+        <div>
+            {% for message in messages %}
+            <div>{{message}}</div>
+            {% endfor %}
+        </div>
         <input type="submit">
     </form>
 </body>

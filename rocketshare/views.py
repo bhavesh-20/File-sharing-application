@@ -2,6 +2,7 @@ from django.shortcuts import render,reverse,redirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import login,logout,authenticate
 from django.contrib import messages
+from .models import *
 import re
 
 # Create your views here.
@@ -81,3 +82,20 @@ def signin(request):
         else:
             messages.info(request,"Invalid Credentials")
             return redirect(reverse('login'))
+
+def share(request):
+    if request.method == "GET":
+        return render(request, 'rocketshare/share.html')
+    else:
+        filename, desc, file = request.POST['filename'], request.POST['description'], request.FILES['file']
+        newfile = SharedFile(name = filename, description = desc, actual_file = file)
+        if request.user.is_authenticated:
+            newfile.owner = request.user
+        else:
+            newfile.owner = None
+        newfile.save()
+        return redirect(reverse('list'))
+
+
+def listfiles(request):
+    return render(request, 'rocketshare/list.html', {'files': SharedFile.objects.all()})

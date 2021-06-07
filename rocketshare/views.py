@@ -5,6 +5,7 @@ from django.contrib import messages
 from .models import *
 import re
 
+
 # Create your views here.
 regex_email = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
 regex_username = '^[a-zA-Z0-9_.-]+$'
@@ -88,6 +89,8 @@ def share(request):
         return render(request, 'rocketshare/share.html')
     else:
         filename, desc, file = request.POST['filename'], request.POST['description'], request.FILES['file']
+        if file.size > 2 * 10**6 and not request.user.is_authenticated:
+            return HttpResponse("File size exceeded, login to continue")
         newfile = SharedFile(name = filename, description = desc, actual_file = file)
         if request.user.is_authenticated:
             newfile.owner = request.user
@@ -98,4 +101,8 @@ def share(request):
 
 
 def listfiles(request):
-    return render(request, 'rocketshare/list.html', {'files': SharedFile.objects.all()})
+    if request.GET.get('search') and request.GET['search'] != '':
+        files = SharedFile.objects.filter(name__icontains = request.GET['search'])
+    else:
+        files = SharedFile.objects.all()
+    return render(request, 'rocketshare/list.html', {'files': files})

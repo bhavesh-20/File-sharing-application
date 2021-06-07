@@ -8,10 +8,23 @@
     color:white;
     background-color: black; 
   }
+
+  .custom_form{
+    display: flex;
+    flex-direction: row;
+  }
 </style>
 {% endblock %}
 {% block content %}
   <section class="maincontainer">
     Lorem ipsum dolor sit amet consectetur adipisicing elit. Architecto dolores corporis excepturi sint inventore ipsum quibusdam dolorum delectus fugit velit quasi dignissimos voluptatem animi, unde voluptas illo omnis ea. Alias.
   </section>
+{% endblock %}
+
+{% block search %}
+<form class="form-inline my-2 my-lg-0 custom_form" method="get" action = "list">
+    {% csrf_token %}
+    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name = "search">
+    <input type="submit" class = "btn btn-outline-success my-2 my-sm-0 " value = "Search">
+</form>
 {% endblock %}

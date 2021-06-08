@@ -1,32 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signup</title>
-</head>
-<body>
-    <form action="" method="post">
-        {% csrf_token %}
-        <label> Username</label>
-        <input type="text" name = "username">
-        <br>
-        <label> Email</label>
-        <input type="email" name = "email">
-        <br>
-        <label> Password 1</label>
-        <input type="password" name = "password1">
-        <br>
-        <label> Password 2</label>
-        <input type="password" name = "password2">
-        <br>
-        <div>
-            {% for message in messages %}
-            <div>{{message}}</div>
-            {% endfor %}
-        </div>
-        <input type="submit">
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block style %}
+
+<style>
+    .signin {
+        width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 100px;
+        border: 1px solid black;
+        padding: 10px;
+    }
+
+    .login {
+        display: block;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 10px;
+    }
+</style>
+
+
+{% endblock %}
+
+
+{% block content %}
+<form method="post" class="signin">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputEmail1">Username</label>
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="Username" name="username">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputEmail1">Email</label>
+        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="Email" name="email">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password1">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">Retype your Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password2">
+    </div>
+    {% if messages %}
+    <div style="margin-top: 12px;" class="messages">
+        {% for message in messages %}
+        <p {% if message.tags %} class="{{ message.tags }}" {% endif %}><i class="fas fa-info-circle">
+                {{ message }}</i></p>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <input type="submit" class="btn btn-primary login" value="Sign Up">
+</form>
+{% endblock %}

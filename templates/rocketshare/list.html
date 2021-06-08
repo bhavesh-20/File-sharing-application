@@ -1,31 +1,41 @@
 {% extends 'base.html' %}
 
 {% block style %}
+
 <style>
-    .custom_form{
+    .card {
+        display: inline-block;
+        margin-bottom: 15px;
+    }
+
+    .card-container {
         display: flex;
         flex-direction: row;
+        justify-content: space-evenly;
+        flex-wrap: wrap;
     }
 </style>
+
 {% endblock %}
 
-{% block search %}
-<form class="form-inline my-2 my-lg-0 custom_form" method="get" action = "list">
-    {% csrf_token %}
-    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name = "search">
-    <input type="submit" class = "btn btn-outline-success my-2 my-sm-0 " value = "Search">
-</form>
-{% endblock %}
 
 {% block content %}
+{% load static %}
+<div class="card-container">
+
     {% for file in files %}
-    {{file.name}}
-    <br>
-    {{file.description}}
-    <br>
-    {{file.timestamp}}
-    <br>
-    <a href="{{ MEDIA_URL }}{{file.actual_file.url}}" download = {{file.name}}>Download</a>
-    <hr>
+    <div class="card" style="width: 18rem;">
+        <!-- <img class="card-img-top" src="..." alt="Card image cap"> -->
+        <embed src="{{file.actual_file.url}}" type="application/pdf" width="286px" height="180px" />
+        <div class="card-body">
+            <h5 class="card-title">{{file.name}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{file.timestamp}}</h6>
+            <p class="card-text">{{file.description}}</p>
+            <a href="{{MEDIA_URL}}{{file.actual_file.url}}" class="btn btn-primary">Download</a>
+        </div>
+    </div>
+
     {% endfor %}
+</div>
+
 {% endblock %}

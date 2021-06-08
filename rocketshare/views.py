@@ -4,6 +4,10 @@ from django.contrib.auth import login,logout,authenticate
 from django.contrib import messages
 from .models import *
 import re
+from django.utils.decorators import method_decorator
+from django.views.decorators.clickjacking import xframe_options_exempt
+
+
 
 
 # Create your views here.
@@ -100,6 +104,7 @@ def share(request):
         return redirect(reverse('list'))
 
 
+@method_decorator(xframe_options_exempt)
 def listfiles(request):
     if request.GET.get('search') and request.GET['search'] != '':
         files = SharedFile.objects.filter(name__icontains = request.GET['search'])

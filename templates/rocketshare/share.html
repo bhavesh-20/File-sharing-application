@@ -1,24 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        <label for=""> FileName</label>
-        <input type="text" name = "filename">
-        <br>
-        <label for=""> Description </label>
-        <input type = "text" name = "description">
-        <br>
-        <label for=""> Upload </label>
-        <input type="file" name="file">
-        <br>
-        <input type = "submit">
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    .signin {
+        width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 100px;
+        border: 1px solid black;
+        padding: 10px;
+    }
+
+    .login {
+        display: block;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 10px;
+    }
+</style>
+
+
+{% endblock %}
+
+{% block content %}
+<!-- <form action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for=""> FileName</label>
+    <input type="text" name="filename">
+    <br>
+    <label for=""> Description </label>
+    <input type="text" name="description">
+    <br>
+    <label for=""> Upload </label>
+    <input type="file" name="file">
+    <br>
+    <input type="submit">
+</form> -->
+
+<form method="post" class="signin" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputEmail1">Filename</label>
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="Filename" name="filename">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">Description</label>
+        <textarea type="textfield" class="form-control" id="exampleInputPassword1" placeholder="Description"
+            name="description"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label for="exampleFormControlFile1">File input</label>
+        <input type="file" class="form-control-file" id="exampleFormControlFile1" name="file">
+    </div>
+
+    <input type="submit" class="btn btn-primary login" value="Upload">
+</form>
+{% endblock %}

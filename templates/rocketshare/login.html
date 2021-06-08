@@ -1,26 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <form action="" method="post">
-        {% csrf_token %}
-        <label for=""> Username or email </label>
-        <input type="text" name = "username">
-        <br>
-        <label for=""> Password </label>
-        <input type="password" name = "password">
-        <br>
-        <div>
-            {% for message in messages %}
-            <div>{{message}}</div>
-            {% endfor %}
-        </div>
-        <input type="submit">
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block style %}
+
+<style>
+    .signin {
+        width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 100px;
+        border: 1px solid black;
+        padding: 10px;
+    }
+
+    .login {
+        display: block;
+        margin-right: auto;
+        margin-left: auto;
+        margin-top: 10px;
+    }
+</style>
+
+
+{% endblock %}
+
+
+{% block content %}
+<form method="post" class="signin">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="exampleInputEmail1">Username or Email address</label>
+        <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+            placeholder="Enter email or Username" name="username">
+    </div>
+    <div class="form-group">
+        <label for="exampleInputPassword1">Password</label>
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
+    </div>
+
+    <input type="submit" class="btn btn-primary login" value="Login">
+</form>
+{% endblock %}

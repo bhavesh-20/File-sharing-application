@@ -6,7 +6,7 @@ from .models import *
 import re
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_exempt
-
+from django.http import JsonResponse
 
 
 
@@ -91,7 +91,11 @@ def signin(request):
 def share(request):
     if request.method == "GET":
         return render(request, 'rocketshare/share.html')
-    else:
+    elif request.is_ajax():
+        print("I'm here!")
+        return JsonResponse({'message': 'Success!'})
+
+    elif request.method == 'POST':
         filename, desc, file = request.POST['filename'], request.POST['description'], request.FILES['file']
         if file.size > 2 * 10**6 and not request.user.is_authenticated:
             return HttpResponse("File size exceeded, login to continue")

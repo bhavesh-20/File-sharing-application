@@ -3,10 +3,11 @@
 {% block style %}
 <style>
     .signin {
+        border-radius: 10px;
         width: 400px;
         margin-left: auto;
         margin-right: auto;
-        margin-top: 100px;
+        margin-top: 40px;
         border: 1px solid black;
         padding: 10px;
     }
@@ -17,44 +18,178 @@
         margin-left: auto;
         margin-top: 10px;
     }
+
+    #login-btn {
+        display: block;
+        margin-right: auto;
+        margin-left: auto;
+        width: 100px;
+    }
+
+    .not-visible {
+        display: none !important;
+    }
+
+    .upload-control {
+        height: 100px;
+        width: 100%;
+        text-align: center;
+    }
+
+    #alert-box {
+        height: 50px;
+        width: 100%;
+        margin-top: 5px;
+        margin-bottom: 20px;
+    }
 </style>
 
 
 {% endblock %}
 
 {% block content %}
-<!-- <form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label for=""> FileName</label>
-    <input type="text" name="filename">
-    <br>
-    <label for=""> Description </label>
-    <input type="text" name="description">
-    <br>
-    <label for=""> Upload </label>
-    <input type="file" name="file">
-    <br>
-    <input type="submit">
-</form> -->
 
-<form method="post" class="signin" action="" enctype="multipart/form-data">
+
+{% if request.user.is_authenticated %}
+<div id="size-limit" style="display: none;">none</div>
+{% else %}
+<div id="size-limit" style="display: none;">2</div>
+{% endif %}
+<br>
+
+<form style="position: relative;" id='upload-form' method="post" class="signin" action="" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
         <label for="exampleInputEmail1">Filename</label>
         <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
-            placeholder="Filename" name="filename">
+            placeholder="Filename" name="filename" required>
     </div>
+    <br>
     <div class="form-group">
         <label for="exampleInputPassword1">Description</label>
         <textarea type="textfield" class="form-control" id="exampleInputPassword1" placeholder="Description"
             name="description"></textarea>
     </div>
-
+    <br>
     <div class="form-group">
         <label for="exampleFormControlFile1">File input</label>
-        <input type="file" class="form-control-file" id="exampleFormControlFile1" name="file">
+        <input required type="file" class="form-control-file" id="exampleFormControlFile1" name="file">
+
+    </div>
+    <div class="upload-control">
+        <div id="alert-box"></div>
+        <div id="progress-box" class="not-visible"></div>
+
+    </div>
+    <div id="cancel-box" class="not-visible">
+        <button type="button" id="cancel-btn" class="btn btn-danger" style="margin-top: 10px;">Cancel</button>
     </div>
 
-    <input type="submit" class="btn btn-primary login" value="Upload">
+
+    <input type="submit" class="btn btn-primary login" id="upload-btn" value="Upload">
+    <a style="color: white;" href="{% url 'login' %}" class=" btn btn-primary login not-visible" id="login-btn">
+        Login</a>
+    <!-- <button class="btn btn-primary login">Login</button> -->
 </form>
+<br>
+
+<script>
+    const uploadForm = document.getElementById('upload-form');
+    const input = document.getElementById('exampleFormControlFile1');
+    const alertBox = document.getElementById('alert-box');
+    const progressBox = document.getElementById('progress-box');
+    const cancelBox = document.getElementById('cancel-box');
+    const cancelBtn = document.getElementById('cancel-btn');
+
+    const csrf = document.getElementsByName('csrfmiddlewaretoken');
+
+
+    input.addEventListener('change', () => {
+        progressBox.classList.remove('not-visible')
+        cancelBox.classList.remove('not-visible')
+
+        const file_data = input.files[0]
+        const url = URL.createObjectURL(file_data)
+        console.log(file_data)
+
+        const fd = new FormData()
+        fd.append('csrfmiddlewaretoken', csrf[0].value)
+        fd.append('file', file_data)
+
+        $.ajax({
+            type: 'POST',
+            url: uploadForm.action,
+            enctype: 'multipart/form-data',
+            data: fd,
+            beforeSend: function () {
+                console.log('before')
+                alertBox.innerHTML = ""
+                // imageBox.innerHTML = ""
+            },
+            xhr: function () {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener('progress', e => {
+                    // console.log(e)
+                    if (e.lengthComputable) {
+                        console.log("Total: ", e.total / 1000000, "MB");
+                        var sizeMB = e.total / 1000000;
+                        const limitMB = document.querySelector('#size-limit').innerHTML;
+                        console.log("Limit: ", limitMB)
+
+                        if (sizeMB > limitMB) {
+                            alertBox.innerHTML = `<div class="alert alert-danger" role="alert">
+                                Limit exceeded! Please login to continue!
+                            </div>`
+                            cancelBox.classList.add('not-visible');
+                            const uploadBtn = document.querySelector("#upload-btn");
+                            uploadBtn.classList.add('not-visible');
+                            const loginBtn = document.querySelector("#login-btn");
+                            loginBtn.classList.remove('not-visible');
+
+
+                            xhr.abort()
+                        }
+
+                        const percent = e.loaded / e.total * 100
+                        console.log(percent)
+                        progressBox.innerHTML = `<div class="progress">
+        <div class="progress-bar" role="progressbar" style="width: ${percent}%" aria-valuenow="${percent}"
+            aria-valuemin="0" aria-valuemax="100"></div></div><p>${percent.toFixed(1)}% of ${sizeMB.toFixed(2)}MB</p>`
+                    }
+
+                })
+                cancelBtn.addEventListener('click', () => {
+                    xhr.abort()
+                    setTimeout(() => {
+                        uploadForm.reset()
+                        progressBox.innerHTML = ""
+                        alertBox.innerHTML = ""
+                        alertBox.innerHTML = `<div class="alert alert-danger" role="alert">
+                            Ups... something went wrong
+                        </div>`
+                        cancelBox.classList.add('not-visible')
+                    }, 1000)
+                })
+                return xhr
+            },
+            success: function (response) {
+                console.log(response)
+                // imageBox.innerHTML = `<img src="${url}" width="300px">`
+                alertBox.innerHTML = `<div class="alert alert-success" role="alert">
+        Successfully uploaded the file!
+    </div>`
+                cancelBox.classList.add('not-visible')
+            },
+            error: function (error) {
+                console.log(error)
+                //             alertBox.innerHTML = `<div class="alert alert-danger" role="alert">
+                //     Ups... something went wrong
+                // </div>`
+            },
+            cache: false,
+            contentType: false,
+            processData: false,
+        })
+    })
+</script>
 {% endblock %}

@@ -3,6 +3,10 @@
 {% block style %}
 
 <style>
+    body {
+        height: 100vh;
+    }
+
     .card {
         display: inline-block;
         margin-bottom: 15px;
@@ -32,10 +36,41 @@
             <h6 class="card-subtitle mb-2 text-muted">{{file.timestamp}}</h6>
             <p class="card-text">{{file.description}}</p>
             <a href="{{MEDIA_URL}}{{file.actual_file.url}}" class="btn btn-primary">Download</a>
+            {% if user.is_authenticated %}
+            {% if file.owner.username == request.user.username %}
+            <a id="{{file.id}}" data-object-id="{{file.id}}" href="" class="btn btn-danger">Delete</a>
+            <script>
+                id = "#" + "{{file.id}}";
+                $(id).on('click', (e) => {
+                    e.preventDefault();
+                    let confirmation = confirm("are you sure you want to remove the item?");
+                    if (confirmation) {
+                        console.log($(this));
+                        $.ajax({
+                            url: "{% url 'delete_file' file.id %}",
+
+                            data: {
+                                dataType: 'json',
+                            },
+
+                            success: function (data) {
+
+                                if (data.deleted) {
+                                    console.log($(e.target).parent().parent().fadeOut(500));
+                                }
+                            }
+                        });
+                    }
+                });
+            </script>
+            {% endif %}
+            {% endif %}
         </div>
     </div>
 
+
     {% endfor %}
 </div>
+
 
 {% endblock %}

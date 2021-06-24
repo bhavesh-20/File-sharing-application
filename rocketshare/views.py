@@ -4,6 +4,7 @@ from django.contrib.auth import login,logout,authenticate
 from django.contrib import messages
 from .models import *
 import re
+from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.clickjacking import xframe_options_exempt
 from django.http import JsonResponse
@@ -115,3 +116,14 @@ def listfiles(request):
     else:
         files = SharedFile.objects.all()
     return render(request, 'rocketshare/list.html', {'files': files})
+
+def delete_file(request, file_id=None):
+    print(file_id)
+    file = SharedFile.objects.get(id=file_id)
+    file.delete()
+    if request.is_ajax():
+        response = {
+            "deleted": True
+        }
+        return JsonResponse(response)
+    return redirect(reverse('list'))
